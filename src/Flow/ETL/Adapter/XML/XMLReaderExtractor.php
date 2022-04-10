@@ -15,8 +15,6 @@ use Flow\ETL\Rows;
  */
 final class XMLReaderExtractor implements Extractor
 {
-    private readonly string $xmlNodePath;
-
     /**
      * In order to iterate only over <element> nodes us root/elements/element.
      *
@@ -32,12 +30,15 @@ final class XMLReaderExtractor implements Extractor
      *
      * @param string $xmlNodePath
      */
-    public function __construct(private readonly string $xmlFilePath, string $xmlNodePath, private readonly int $rowsInBatch, private readonly string $rowEntryName = 'row')
-    {
+    public function __construct(
+        private readonly string $xmlFilePath,
+        private readonly string $xmlNodePath,
+        private readonly int $rowsInBatch,
+        private readonly string $rowEntryName = 'row'
+    ) {
         if (!\strlen($xmlNodePath)) {
             throw new InvalidArgumentException('XML Node Path cant be empty');
         }
-        $this->xmlNodePath = $xmlNodePath;
     }
 
     /**
