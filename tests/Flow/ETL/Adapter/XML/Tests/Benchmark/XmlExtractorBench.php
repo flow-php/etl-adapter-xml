@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\Text\Tests\Benchmark;
+namespace Flow\ETL\Adapter\XML\Tests\Benchmark;
 
 use Flow\ETL\DSL\XML;
 use PhpBench\Attributes\Iterations;
