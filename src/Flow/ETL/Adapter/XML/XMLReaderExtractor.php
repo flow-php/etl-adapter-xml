@@ -57,8 +57,9 @@ final class XMLReaderExtractor implements Extractor
                         $currentPathBreadCrumbs[] = $xmlReader->name;
                     }
 
-                    if ($xmlReader->depth < $previousDepth) {
+                    while ($xmlReader->depth < $previousDepth) {
                         \array_pop($currentPathBreadCrumbs);
+                        --$previousDepth;
                     }
 
                     $currentPath = \implode('/', $currentPathBreadCrumbs);
@@ -88,7 +89,6 @@ final class XMLReaderExtractor implements Extractor
             }
 
             $xmlReader->close();
-
             if ([] !== $rows) {
                 yield new Rows(...$rows);
             }
