@@ -18,9 +18,9 @@ use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 use Flow\ETL\PHP\Type\Caster;
-use PHPUnit\Framework\TestCase;
+use Flow\ETL\Tests\FlowTestCase;
 
-final class EntryNormalizerTest extends TestCase
+final class EntryNormalizerTest extends FlowTestCase
 {
     public function test_normalization_entries_into_attributes() : void
     {

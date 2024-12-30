@@ -8,9 +8,9 @@ use function Flow\ETL\DSL\{type_array, type_boolean, type_datetime, type_float, 
 use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 use Flow\ETL\PHP\Type\Caster;
-use PHPUnit\Framework\TestCase;
+use Flow\ETL\Tests\FlowTestCase;
 
-final class PHPValueNormalizerTest extends TestCase
+final class PHPValueNormalizerTest extends FlowTestCase
 {
     public function test_normalizing_array_type() : void
     {

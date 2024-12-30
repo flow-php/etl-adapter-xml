@@ -6,9 +6,9 @@ namespace Flow\ETL\Adapter\XML\Tests\Unit\XMLWriter;
 
 use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Adapter\XML\XMLWriter\DOMDocumentWriter;
-use PHPUnit\Framework\TestCase;
+use Flow\ETL\Tests\FlowTestCase;
 
-final class DOMDocumentWriterTest extends TestCase
+final class DOMDocumentWriterTest extends FlowTestCase
 {
     public function test_writing_empty_child_node() : void
     {

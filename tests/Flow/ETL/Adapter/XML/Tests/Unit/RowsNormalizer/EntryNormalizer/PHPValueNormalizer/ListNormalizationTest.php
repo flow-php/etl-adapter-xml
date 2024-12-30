@@ -8,9 +8,9 @@ use function Flow\ETL\DSL\{structure_element, type_int, type_integer, type_list,
 use Flow\ETL\Adapter\XML\Abstraction\XMLNode;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 use Flow\ETL\PHP\Type\Caster;
-use PHPUnit\Framework\TestCase;
+use Flow\ETL\Tests\FlowTestCase;
 
-final class ListNormalizationTest extends TestCase
+final class ListNormalizationTest extends FlowTestCase
 {
     public function test_normalization_of_list_of_flat_structures() : void
     {

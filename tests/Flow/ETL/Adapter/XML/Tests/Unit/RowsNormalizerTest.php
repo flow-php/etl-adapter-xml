@@ -21,9 +21,9 @@ use Flow\ETL\Adapter\XML\RowsNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 use Flow\ETL\PHP\Type\Caster;
-use PHPUnit\Framework\TestCase;
+use Flow\ETL\Tests\FlowTestCase;
 
-final class RowsNormalizerTest extends TestCase
+final class RowsNormalizerTest extends FlowTestCase
 {
     public function test_normalization_of_rows() : void
     {
