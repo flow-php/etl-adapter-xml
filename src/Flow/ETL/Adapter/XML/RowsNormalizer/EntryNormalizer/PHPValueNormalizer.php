@@ -7,7 +7,6 @@ namespace Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use function Flow\ETL\DSL\{type_json, type_string};
 use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Exception\InvalidArgumentException;
-use Flow\ETL\PHP\Type\Logical\Structure\StructureElement;
 use Flow\ETL\PHP\Type\Logical\{DateTimeType, JsonType, ListType, MapType, StructureType, UuidType};
 use Flow\ETL\PHP\Type\Native\{ArrayType,
     BooleanType,
@@ -55,7 +54,7 @@ final readonly class PHPValueNormalizer
             }
 
             foreach ($value as $elementValue) {
-                $listNode = $listNode->append($this->normalize($this->listElementName, $type->element()->type(), $elementValue));
+                $listNode = $listNode->append($this->normalize($this->listElementName, $type->element(), $elementValue));
             }
 
             return $listNode;
@@ -71,8 +70,8 @@ final readonly class PHPValueNormalizer
             foreach ($value as $key => $elementValue) {
                 $mapNode = $mapNode->append(
                     XMLNode::nestedNode($this->mapElementName)
-                        ->append($this->normalize($this->mapElementKeyName, $type->key()->type(), $key))
-                        ->append($this->normalize($this->mapElementValueName, $type->value()->type(), $elementValue))
+                        ->append($this->normalize($this->mapElementKeyName, $type->key(), $key))
+                        ->append($this->normalize($this->mapElementValueName, $type->value(), $elementValue))
                 );
             }
 
@@ -90,12 +89,12 @@ final readonly class PHPValueNormalizer
             $structureIterator->attachIterator(new \ArrayIterator($type->elements()), 'structure_element');
             $structureIterator->attachIterator(new \ArrayIterator($value), 'value_element');
 
-            foreach ($structureIterator as $element) {
-                /** @var StructureElement $structureElement */
-                $structureElement = $element['structure_element'];
+            foreach ($structureIterator as $keys => $element) {
+                /** @var Type<mixed> $structureElementType */
+                $structureElementType = $element['structure_element'];
                 $structureValue = $element['value_element'];
 
-                $structureNode = $structureNode->append($this->normalize($structureElement->name(), $structureElement->type(), $structureValue));
+                $structureNode = $structureNode->append($this->normalize($keys['structure_element'], $structureElementType, $structureValue));
             }
 
             return $structureNode;
