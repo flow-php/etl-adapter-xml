@@ -95,6 +95,7 @@ final class PHPValueNormalizerTest extends FlowTestCase
     {
         self::markTestSkipped('We need to figure out what to do with object types');
 
+        /** @phpstan-ignore-next-line */
         $normalizer = new PHPValueNormalizer(Caster::default());
 
         self::assertEquals(
