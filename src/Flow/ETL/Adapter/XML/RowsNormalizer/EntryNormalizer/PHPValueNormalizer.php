@@ -7,6 +7,7 @@ namespace Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use function Flow\ETL\DSL\{type_json, type_string};
 use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Exception\InvalidArgumentException;
+use Flow\ETL\PHP\Type\{Caster, Type};
 use Flow\ETL\PHP\Type\Logical\{DateTimeType, JsonType, ListType, MapType, StructureType, UuidType};
 use Flow\ETL\PHP\Type\Native\{ArrayType,
     BooleanType,
@@ -15,7 +16,6 @@ use Flow\ETL\PHP\Type\Native\{ArrayType,
     IntegerType,
     ObjectType,
     StringType};
-use Flow\ETL\PHP\Type\{Caster, Type};
 
 final readonly class PHPValueNormalizer
 {

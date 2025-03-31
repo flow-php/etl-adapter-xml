@@ -7,10 +7,10 @@ namespace Flow\ETL\Adapter\XML\Tests\Integration;
 use function Flow\ETL\Adapter\XML\from_xml;
 use function Flow\ETL\DSL\{config, data_frame};
 use function Flow\ETL\DSL\{flow_context, type_string};
-use Flow\ETL\Extractor\Signal;
 use Flow\ETL\{Adapter\XML\XMLParserExtractor,
     PHP\Type\Caster,
     Tests\FlowIntegrationTestCase};
+use Flow\ETL\Extractor\Signal;
 use Flow\Filesystem\Path;
 
 final class XMLParserExtractorTest extends FlowIntegrationTestCase

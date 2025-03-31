@@ -7,8 +7,8 @@ namespace Flow\ETL\Adapter\XML\Loader;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 use Flow\ETL\Adapter\XML\{RowsNormalizer, XMLWriter};
-use Flow\ETL\Loader\Closure;
 use Flow\ETL\{FlowContext, Loader, Rows};
+use Flow\ETL\Loader\Closure;
 use Flow\Filesystem\{DestinationStream, Partition, Path};
 
 final class XMLLoader implements Closure, Loader, Loader\FileLoader
