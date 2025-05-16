@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Flow\ETL\Adapter\XML\Tests\Unit\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 
-use function Flow\ETL\DSL\{type_int, type_integer, type_list, type_map, type_string, type_structure};
+use function Flow\Types\DSL\{type_integer, type_list, type_map, type_string, type_structure};
 use Flow\ETL\Adapter\XML\Abstraction\XMLNode;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
-use Flow\ETL\PHP\Type\Caster;
 use Flow\ETL\Tests\FlowTestCase;
 
 final class ListNormalizationTest extends FlowTestCase
 {
     public function test_normalization_of_list_of_flat_structures() : void
     {
-        $normalizer = new PHPValueNormalizer(Caster::default());
+        $normalizer = new PHPValueNormalizer();
 
         self::assertEquals(
             XMLNode::nestedNode('list')
@@ -33,7 +32,7 @@ final class ListNormalizationTest extends FlowTestCase
                 type_list(
                     type_structure([
                         'name' => type_string(),
-                        'age' => type_int(),
+                        'age' => type_integer(),
                     ])
                 ),
                 [['name' => 'John', 'age' => 30], ['name' => 'Jane', 'age' => 25]]
@@ -43,7 +42,7 @@ final class ListNormalizationTest extends FlowTestCase
 
     public function test_normalizing_empty_list() : void
     {
-        $normalizer = new PHPValueNormalizer(Caster::default());
+        $normalizer = new PHPValueNormalizer();
 
         self::assertEquals(
             XMLNode::nestedNode('list'),
@@ -53,7 +52,7 @@ final class ListNormalizationTest extends FlowTestCase
 
     public function test_normalizing_list_of_integers() : void
     {
-        $normalizer = new PHPValueNormalizer(Caster::default());
+        $normalizer = new PHPValueNormalizer();
 
         self::assertEquals(
             XMLNode::nestedNode('list')
@@ -66,7 +65,7 @@ final class ListNormalizationTest extends FlowTestCase
 
     public function test_normalizing_list_of_list_of_integers() : void
     {
-        $normalizer = new PHPValueNormalizer(Caster::default());
+        $normalizer = new PHPValueNormalizer();
 
         self::assertEquals(
             XMLNode::nestedNode('list')
@@ -88,7 +87,7 @@ final class ListNormalizationTest extends FlowTestCase
 
     public function test_normalizing_list_of_map_of_str_to_int() : void
     {
-        $normalizer = new PHPValueNormalizer(Caster::default());
+        $normalizer = new PHPValueNormalizer();
 
         self::assertEquals(
             XMLNode::nestedNode('list')

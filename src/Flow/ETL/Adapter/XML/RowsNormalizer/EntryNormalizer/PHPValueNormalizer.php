@@ -4,23 +4,16 @@ declare(strict_types=1);
 
 namespace Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 
-use function Flow\ETL\DSL\{type_json, type_string};
+use function Flow\Types\DSL\{type_json, type_string};
 use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Exception\InvalidArgumentException;
-use Flow\ETL\PHP\Type\{Caster, Type};
-use Flow\ETL\PHP\Type\Logical\{DateTimeType, JsonType, ListType, MapType, StructureType, UuidType};
-use Flow\ETL\PHP\Type\Native\{ArrayType,
-    BooleanType,
-    EnumType,
-    FloatType,
-    IntegerType,
-    ObjectType,
-    StringType};
+use Flow\Types\Type\Logical\{DateTimeType, InstanceOfType, JsonType, ListType, MapType, StructureType, UuidType};
+use Flow\Types\Type\Native\{ArrayType, BooleanType, EnumType, FloatType, IntegerType, StringType};
+use Flow\Types\Type\{Type};
 
 final readonly class PHPValueNormalizer
 {
     public function __construct(
-        private Caster $caster,
         public string $attributePrefix = '_',
         public string $dateTimeFormat = 'Y-m-d\TH:i:s.uP',
         public string $listElementName = 'element',
@@ -39,7 +32,7 @@ final readonly class PHPValueNormalizer
     public function normalize(string $name, Type $type, mixed $value) : XMLNode|XMLAttribute
     {
         if (\str_starts_with($name, $this->attributePrefix)) {
-            return new XMLAttribute(\substr($name, \strlen($this->attributePrefix)), (string) $this->caster->to(type_string())->value($value));
+            return new XMLAttribute(\substr($name, \strlen($this->attributePrefix)), (string) type_string()->cast($value));
         }
 
         if ($value === null) {
@@ -104,12 +97,12 @@ final readonly class PHPValueNormalizer
             StringType::class,
             IntegerType::class,
             BooleanType::class,
-            FloatType::class => XMLNode::flatNode($name, $this->caster->to(type_string())->value($value)),
-            ArrayType::class => XMLNode::flatNode($name, $this->caster->to(type_json())->value($value)),
+            FloatType::class => XMLNode::flatNode($name, type_string()->cast($value)),
+            ArrayType::class => XMLNode::flatNode($name, type_json()->cast($value)),
             EnumType::class => XMLNode::flatNode($name, $value->name),
-            ObjectType::class => XMLNode::flatNode($name, $this->caster->to(type_string())->value($value)),
-            DateTimeType::class => XMLNode::flatNode($name, $this->caster->to(type_string())->value($value->format($this->dateTimeFormat))),
-            JsonType::class => XMLNode::flatNode($name, $this->caster->to(type_json())->value($value)),
+            InstanceOfType::class => XMLNode::flatNode($name, type_string()->cast($value)),
+            DateTimeType::class => XMLNode::flatNode($name, type_string()->cast($value->format($this->dateTimeFormat))),
+            JsonType::class => XMLNode::flatNode($name, type_json()->cast($value)),
             UuidType::class => XMLNode::flatNode($name, (string) $value),
             default => throw new InvalidArgumentException("Given type can't be converted to node, given type: {$type->toString()}"),
         };

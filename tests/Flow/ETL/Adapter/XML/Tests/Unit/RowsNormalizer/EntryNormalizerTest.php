@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Flow\ETL\Adapter\XML\Tests\Unit\RowsNormalizer;
 
-use function Flow\ETL\DSL\{str_entry,
-    structure_entry,
-    type_boolean,
+use function Flow\ETL\DSL\{str_entry, structure_entry};
+use function Flow\Types\DSL\{type_boolean,
     type_datetime,
     type_integer,
     type_list,
@@ -16,14 +15,13 @@ use function Flow\ETL\DSL\{str_entry,
 use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
-use Flow\ETL\PHP\Type\Caster;
 use Flow\ETL\Tests\FlowTestCase;
 
 final class EntryNormalizerTest extends FlowTestCase
 {
     public function test_normalization_entries_into_attributes() : void
     {
-        $entryNormalizer = new EntryNormalizer(new PHPValueNormalizer(Caster::default()));
+        $entryNormalizer = new EntryNormalizer(new PHPValueNormalizer());
 
         self::assertEquals(
             new XMLAttribute('id', '1'),
@@ -33,7 +31,7 @@ final class EntryNormalizerTest extends FlowTestCase
 
     public function test_normalizing_structure_entry() : void
     {
-        $entryNormalizer = new EntryNormalizer(new PHPValueNormalizer(Caster::default()));
+        $entryNormalizer = new EntryNormalizer(new PHPValueNormalizer());
 
         $structure = structure_entry(
             'structure',

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Flow\ETL\Adapter\XML\Tests\Unit;
 
-use function Flow\ETL\DSL\{row,
-    rows,
-    str_entry,
-    structure_entry,
-    type_boolean,
+use function Flow\ETL\DSL\{row, rows, str_entry, structure_entry};
+use function Flow\Types\DSL\{type_boolean,
     type_datetime,
     type_integer,
     type_list,
@@ -19,14 +16,13 @@ use Flow\ETL\Adapter\XML\Abstraction\{XMLAttribute, XMLNode};
 use Flow\ETL\Adapter\XML\RowsNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
-use Flow\ETL\PHP\Type\Caster;
 use Flow\ETL\Tests\FlowTestCase;
 
 final class RowsNormalizerTest extends FlowTestCase
 {
     public function test_normalization_of_rows() : void
     {
-        $normalizer = new RowsNormalizer(new EntryNormalizer(new PHPValueNormalizer(Caster::default())));
+        $normalizer = new RowsNormalizer(new EntryNormalizer(new PHPValueNormalizer()));
 
         $rows = rows(
             row(
@@ -128,7 +124,7 @@ final class RowsNormalizerTest extends FlowTestCase
 
     public function test_normalizing_rows_with_attributes() : void
     {
-        $normalizer = new RowsNormalizer(new EntryNormalizer(new PHPValueNormalizer(Caster::default())));
+        $normalizer = new RowsNormalizer(new EntryNormalizer(new PHPValueNormalizer()));
 
         self::assertEquals(
             XMLNode::nestedNode('row')

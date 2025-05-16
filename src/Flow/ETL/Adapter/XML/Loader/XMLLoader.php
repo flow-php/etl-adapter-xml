@@ -8,10 +8,10 @@ use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
 use Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer\PHPValueNormalizer;
 use Flow\ETL\Adapter\XML\{RowsNormalizer, XMLWriter};
 use Flow\ETL\{FlowContext, Loader, Rows};
-use Flow\ETL\Loader\Closure;
+use Flow\ETL\Loader\{Closure, FileLoader};
 use Flow\Filesystem\{DestinationStream, Partition, Path};
 
-final class XMLLoader implements Closure, Loader, Loader\FileLoader
+final class XMLLoader implements Closure, FileLoader, Loader
 {
     private string $attributePrefix = '_';
 
@@ -64,7 +64,6 @@ final class XMLLoader implements Closure, Loader, Loader\FileLoader
         $normalizer = new RowsNormalizer(
             new EntryNormalizer(
                 new PHPValueNormalizer(
-                    $context->config->caster(),
                     $this->attributePrefix,
                     $this->dateTimeFormat,
                     $this->listElementName,
