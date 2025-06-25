@@ -156,6 +156,9 @@ final class XMLParserExtractor implements Extractor, FileExtractor, LimitableExt
         return $this->path;
     }
 
+    /**
+     * @param array<string, mixed> $attrs
+     */
     public function startElementHandler(\XMLParser $parser, string $name, array $attrs) : void
     {
         $this->currentPath[] = $name;
@@ -166,13 +169,13 @@ final class XMLParserExtractor implements Extractor, FileExtractor, LimitableExt
             $this->writer()->startElement($name);
 
             foreach ($attrs as $key => $value) {
-                $this->writer()->writeAttribute($key, $value);
+                $this->writer()->writeAttribute($key, \is_scalar($value) ? (string) $value : '');
             }
         } elseif ($this->capturing) {
             $this->writer()->startElement($name);
 
             foreach ($attrs as $key => $value) {
-                $this->writer()->writeAttribute($key, $value);
+                $this->writer()->writeAttribute($key, \is_scalar($value) ? (string) $value : '');
             }
         }
     }
