@@ -16,7 +16,7 @@
         "ext-xml": "*",
         "ext-xmlreader": "*",
         "ext-xmlwriter": "*",
-        "flow-php/etl": "^0.20.0 || 1.x-dev"
+        "flow-php/etl": "self.version"
     },
     "config": {
         "optimize-autoloader": true,
