@@ -2,23 +2,33 @@
 
 declare(strict_types=1);
 
-namespace Flow\ETL\Adapter\XML\RowsNormalizer\EntryNormalizer;
+namespace Flow\ETL\Adapter\XML;
 
 use ArrayIterator;
 use BackedEnum;
 use Countable;
+use DateInterval;
 use DateTimeInterface;
+use Dom\XMLDocument;
+use DOMDocument;
 use Flow\ETL\Adapter\XML\Abstraction\XMLAttribute;
 use Flow\ETL\Adapter\XML\Abstraction\XMLNode;
 use Flow\ETL\Exception\InvalidArgumentException;
+use Flow\ETL\Exception\RuntimeException;
+use Flow\ETL\Row\Encoder;
+use Flow\ETL\Row\RawRowValues;
 use Flow\Types\Type;
 use Flow\Types\Type\Logical\DateTimeType;
+use Flow\Types\Type\Logical\DateType;
 use Flow\Types\Type\Logical\InstanceOfType;
 use Flow\Types\Type\Logical\JsonType;
 use Flow\Types\Type\Logical\ListType;
 use Flow\Types\Type\Logical\MapType;
 use Flow\Types\Type\Logical\StructureType;
+use Flow\Types\Type\Logical\TimeType;
 use Flow\Types\Type\Logical\UuidType;
+use Flow\Types\Type\Logical\XMLElementType;
+use Flow\Types\Type\Logical\XMLType;
 use Flow\Types\Type\Native\ArrayType;
 use Flow\Types\Type\Native\BooleanType;
 use Flow\Types\Type\Native\EnumType;
@@ -29,6 +39,7 @@ use MultipleIterator;
 use Stringable;
 
 use function count;
+use function Flow\ETL\DSL\date_interval_to_microseconds;
 use function Flow\Types\DSL\type_string;
 use function is_array;
 use function is_iterable;
@@ -40,23 +51,59 @@ use function substr;
 
 use const JSON_THROW_ON_ERROR;
 
-final readonly class PHPValueNormalizer
+/**
+ * @implements Encoder<string>
+ */
+final class XMLEncoder implements Encoder
 {
     public function __construct(
-        public string $attributePrefix = '_',
-        public string $dateTimeFormat = 'Y-m-d\TH:i:s.uP',
-        public string $listElementName = 'element',
-        public string $mapElementName = 'element',
-        public string $mapElementKeyName = 'key',
-        public string $mapElementValueName = 'value',
+        private readonly ?XMLWriter $xmlWriter = null,
+        private readonly string $attributePrefix = '_',
+        private readonly string $dateTimeFormat = 'Y-m-d\TH:i:s.uP',
+        private readonly string $dateFormat = 'Y-m-d',
+        private readonly string $listElementName = 'element',
+        private readonly string $mapElementName = 'element',
+        private readonly string $mapElementKeyName = 'key',
+        private readonly string $mapElementValueName = 'value',
+        private readonly string $rowElementName = 'row',
     ) {}
+
+    public function decode(array $batch): array
+    {
+        $maps = [];
+
+        foreach ($batch as $xml) {
+            $maps[] = new RawRowValues(['node' => $xml]);
+        }
+
+        return $maps;
+    }
+
+    public function encode(array $batch): array
+    {
+        $xmlWriter = $this->xmlWriter ?? throw new RuntimeException('XMLEncoder requires an XMLWriter to encode rows');
+
+        $lines = [];
+
+        foreach ($batch as $rowValues) {
+            $node = XMLNode::nestedNode($this->rowElementName);
+
+            foreach ($rowValues->types as $name => $type) {
+                $node = $node->append($this->normalize($name, $type, $rowValues->values[$name]));
+            }
+
+            $lines[] = $xmlWriter->write($node);
+        }
+
+        return $lines;
+    }
 
     /**
      * @param Type<mixed> $type
      *
      * @throws InvalidArgumentException
      */
-    public function normalize(string $name, Type $type, mixed $value): XMLNode|XMLAttribute
+    private function normalize(string $name, Type $type, mixed $value): XMLNode|XMLAttribute
     {
         if (str_starts_with($name, $this->attributePrefix)) {
             return new XMLAttribute(substr($name, strlen($this->attributePrefix)), type_string()->cast($value));
@@ -69,15 +116,7 @@ final readonly class PHPValueNormalizer
         if ($type instanceof ListType) {
             $listNode = XMLNode::nestedNode($name);
 
-            if (!is_array($value) && !$value instanceof Countable) {
-                return $listNode;
-            }
-
-            if (!count($value)) {
-                return $listNode;
-            }
-
-            if (!is_iterable($value)) {
+            if (!is_array($value) && !$value instanceof Countable || !count($value) || !is_iterable($value)) {
                 return $listNode;
             }
 
@@ -96,15 +135,7 @@ final readonly class PHPValueNormalizer
         if ($type instanceof MapType) {
             $mapNode = XMLNode::nestedNode($name);
 
-            if (!is_array($value) && !$value instanceof Countable) {
-                return $mapNode;
-            }
-
-            if (!count($value)) {
-                return $mapNode;
-            }
-
-            if (!is_iterable($value)) {
+            if (!is_array($value) && !$value instanceof Countable || !count($value) || !is_iterable($value)) {
                 return $mapNode;
             }
 
@@ -162,14 +193,42 @@ final readonly class PHPValueNormalizer
                 $name,
                 type_string()->cast($value instanceof DateTimeInterface ? $value->format($this->dateTimeFormat) : ''),
             ),
+            DateType::class => XMLNode::flatNode(
+                $name,
+                type_string()->cast($value instanceof DateTimeInterface ? $value->format($this->dateFormat) : ''),
+            ),
+            TimeType::class => XMLNode::flatNode(
+                $name,
+                $value instanceof DateInterval ? (string) date_interval_to_microseconds($value) : '',
+            ),
             JsonType::class => XMLNode::flatNode($name, $value instanceof Stringable ? $value->__toString() : ''),
             UuidType::class => XMLNode::flatNode(
                 $name,
                 is_scalar($value) || $value instanceof Stringable ? (string) $value : '',
             ),
+            XMLType::class, XMLElementType::class => XMLNode::flatNode($name, $this->xmlToString($value)),
             default => throw new InvalidArgumentException(
                 "Given type can't be converted to node, given type: {$type->toString()}",
             ),
         };
+    }
+
+    private function xmlToString(mixed $value): string
+    {
+        if ($value instanceof XMLDocument) {
+            $serialized = $value->saveXml($value->documentElement);
+        } elseif ($value instanceof DOMDocument) {
+            $serialized = $value->saveXML($value->documentElement);
+        } elseif ($value instanceof Stringable || is_scalar($value)) {
+            return (string) $value;
+        } else {
+            return '';
+        }
+
+        if ($serialized === false) {
+            throw new RuntimeException('Failed to serialize XML document.');
+        }
+
+        return $serialized;
     }
 }
